@@ -1,43 +1,27 @@
 <?php
-/**
- * @package AyonLiu
- */
+include_once "wxBizDataCrypt.php";
 
-class WXLogin {
+class WXDecrypt {
     // Declare the MyStyle property before use.
     protected string $namespace;
     protected string $resource_name;
 
-    const CODE2SESSION= 'https://api.weixin.qq.com/sns/jscode2session';
-
     // initialize namespace and resource name.
     public function __construct() {
       $this->namespace     = '/wxauth/v1';
-      $this->resource_name = 'login';
+      $this->resource_name = 'decrypt';
     }
 
     // Register routes.
     public function register_routes() {
-      register_rest_route( 
-        $this->namespace,
-        '/' . $this->resource_name,
-        [
-          // Here we register the readable endpoint for collections.
-          [
-              'methods'   => 'GET',
-              'callback'  => array( $this, 'get_items' ),
-              'permission_callback' => array( $this, 'get_items_permissions_check' ),
-          ],
-        ]
-      );
-      register_rest_route( 
+      register_rest_route(
         $this->namespace,
         '/' . $this->resource_name,
         [
           // Here we register the readable endpoint for collections.
           [
               'methods'   => 'POST',
-              'callback'  => array( $this, 'get_items' ),
+              'callback'  => array( $this, 'decrypt' ),
               'permission_callback' => array( $this, 'get_items_permissions_check' ),
           ],
         ]
@@ -48,21 +32,21 @@ class WXLogin {
      *
      * @param WP_REST_Request $request Current request.
      */
-    public function get_items( $request ) {
+    public function decrypt( $request ) {
         // Return response data.
         // var_dump($request);
-        $code = $request->get_param('code');
-        $params = [
-            'appid' => WX_APPID,
-            'secret' => WX_SECRET,
-            'js_code' => $code,
-            'grant_type' => 'authorization_code'
-        ];
-        $code2session_url = self::CODE2SESSION . '?' . http_build_query($params);
-        $response = wp_remote_get( $code2session_url );
-        $body     = wp_remote_retrieve_body( $response );
+        $params = $request->get_json_params();
+        
+        // $pc = new WXBizDataCrypt(WX_APPID, $sessionKey);
+        // $errCode = $pc->decryptData($encryptedData, $iv, $data );
+
+        // if ($errCode == 0) {
+        //     print($data . "\n");
+        // } else {
+        //     print($errCode . "\n");
+        // }
         // return rest_ensure_response( $request->get_params() );
-        return rest_ensure_response( json_decode($body) );
+        return rest_ensure_response( $params );
     }
       /**
      * Check permissions
@@ -89,9 +73,9 @@ class WXLogin {
 }
 
 // Function to register our new routes from the controller.
-// function wxauth_register_routes() {
-//   $controller = new WXLogin();
+// function decrypt_register_routes() {
+//   $controller = new WXDecrypt();
 //   $controller->register_routes();
 // }
 
-// add_action( 'rest_api_init', 'wxauth_register_routes' );
+// add_action( 'rest_api_init', 'decrypt_register_routes' );
