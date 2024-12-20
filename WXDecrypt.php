@@ -1,5 +1,5 @@
 <?php
-include_once "wxBizDataCrypt.php";
+include_once plugin_dir_path(__FILE__) . "wxBizDataCrypt.php";
 
 class WXDecrypt {
     // Declare the MyStyle property before use.
@@ -36,17 +36,19 @@ class WXDecrypt {
         // Return response data.
         // var_dump($request);
         $params = $request->get_json_params();
-        
-        // $pc = new WXBizDataCrypt(WX_APPID, $sessionKey);
-        // $errCode = $pc->decryptData($encryptedData, $iv, $data );
+        $sessionKey    = $params['sessionKey'];
+        $encryptedData = $params['encryptedData'];
+        $iv            = $params['sessionKey'];
+        $pc = new WXBizDataCrypt(WX_APPID, $sessionKey);
+        $errCode = $pc->decryptData($encryptedData, $iv, $data);
 
-        // if ($errCode == 0) {
-        //     print($data . "\n");
-        // } else {
-        //     print($errCode . "\n");
-        // }
+        if ($errCode == 0) {
+            // print($data . "\n");
+        } else {
+            // print($errCode . "\n");
+        }
         // return rest_ensure_response( $request->get_params() );
-        return rest_ensure_response( $params );
+        return rest_ensure_response( [$errCode, $data] );
     }
       /**
      * Check permissions
